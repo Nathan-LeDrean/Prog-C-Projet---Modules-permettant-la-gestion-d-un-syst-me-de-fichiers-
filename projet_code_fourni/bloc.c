@@ -5,6 +5,9 @@
  * Module de gestion des blocs de données.
  **/
 
+#include <stdlib.h> 
+#include <stdio.h> 
+#include <string.h> 
 #include "bloc.h"
 
 /* V1
@@ -12,8 +15,14 @@
  * Entrée : Aucune
  * Retour : le bloc créé ou NULL en cas de problème
  */
-tBloc CreerBloc (void) {
-  // A COMPLETER
+tBloc CreerBloc(void) {
+    tBloc bloc = (tBloc)malloc(TAILLE_BLOC * sizeof(unsigned char));
+
+    if (bloc == NULL) {
+        fprintf(stderr, "CreerBloc: probleme creation\n");
+        return NULL;
+    }
+    return bloc;
 }
 
 /* V1
@@ -22,7 +31,10 @@ tBloc CreerBloc (void) {
  * Retour : aucun
  */
 void DetruireBloc(tBloc *pBloc) {
-  // A COMPLETER
+    if (pBloc != NULL && *pBloc != NULL) {
+        free(*pBloc); 
+        *pBloc = NULL; 
+    }
 }
 
 /* V1
@@ -31,8 +43,21 @@ void DetruireBloc(tBloc *pBloc) {
  * Entrées : le bloc, l'adresse du contenu à copier et sa taille en octets
  * Retour : le nombre d'octets effectivement écrits dans le bloc
  */
-long EcrireContenuBloc (tBloc bloc, unsigned char *contenu, long taille) {
-  // A COMPLETER
+long EcrireContenuBloc(tBloc bloc, unsigned char *contenu, long taille) {
+    if (bloc == NULL || contenu == NULL) {
+        return 0;
+    }
+
+    long octetsAEcrire = taille;
+    if (taille > TAILLE_BLOC) {
+        octetsAEcrire = TAILLE_BLOC;
+    }
+
+    for (int i = 0; i < octetsAEcrire; i++) {
+        bloc[i] = contenu[i];
+    }
+
+    return octetsAEcrire;
 }
 
 /* V1
@@ -42,5 +67,18 @@ long EcrireContenuBloc (tBloc bloc, unsigned char *contenu, long taille) {
  * Retour : le nombre d'octets effectivement lus dans le bloc
  */
 long LireContenuBloc(tBloc bloc, unsigned char *contenu, long taille) {
-  // A COMPLETER
+    if (bloc == NULL || contenu == NULL) {
+        return 0;
+    }
+
+    long octetsALire = taille;
+    if (taille > TAILLE_BLOC) {
+        octetsALire = TAILLE_BLOC;
+    }
+
+    for (int i = 0; i < octetsALire; i++) {
+        contenu[i] = bloc[i];
+    }
+
+    return octetsALire;
 }
