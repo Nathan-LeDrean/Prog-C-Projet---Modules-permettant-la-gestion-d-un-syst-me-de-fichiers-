@@ -21,7 +21,6 @@ int main(void) {
 
     // 3. Écriture de données
     char message[] = "Bonjour, ceci est un test d'ecriture dans le bloc 0.";
-    // +1 pour inclure le caractère nul de fin de chaîne
     long tailleMsg = strlen(message) + 1; 
 
     printf("\n[2] Ecriture de %ld octets : \"%s\"\n", tailleMsg, message);
@@ -48,7 +47,7 @@ int main(void) {
 
     // 6. Destruction
     printf("\n[4] Destruction de l'inode...\n");
-    DetruireInode(&monInode); // Passage par adresse pour mise à NULL
+    DetruireInode(&monInode); 
 
     if (monInode == NULL) {
         printf("Inode detruit avec succes (pointeur NULL).\n");

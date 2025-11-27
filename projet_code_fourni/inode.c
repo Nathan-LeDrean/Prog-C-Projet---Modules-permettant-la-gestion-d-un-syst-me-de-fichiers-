@@ -38,7 +38,6 @@ struct sInode
 tInode CreerInode(int numInode, natureFichier type) {
     time_t t;
 
-    // Allocation mémoire
     tInode inode = (tInode)malloc(sizeof(struct sInode));
 
     if (inode == NULL) {
@@ -50,12 +49,10 @@ tInode CreerInode(int numInode, natureFichier type) {
     inode->type = type;
     inode->taille = 0;
 
-    // Initialisation des blocs à NULL
     for (int i = 0; i < NB_BLOCS_DIRECTS; i++) {
         inode->blocDonnees[i] = NULL;
     }
 
-    // Gestion du temps
     t = time(NULL);
     inode->dateDerAcces = t;
     inode->dateDerModif = t;
@@ -147,7 +144,6 @@ void AfficherInode(tInode inode) {
     printf("Inode %u :\n", inode->numero); 
     printf("type : ");
     
-    // Remplacement du switch par des if / else if
     if (inode->type == ORDINAIRE) {
         printf("Ordinaire\n");
     } else if (inode->type == REPERTOIRE) {

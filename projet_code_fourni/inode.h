@@ -1,11 +1,11 @@
 /**
  * ProgC - Projet Automne 25-26 : Gestion de systèmes de fichiers
- * VERSION 1
+ * VERSION 2 = VERSION 1
  * Fichier : inode.h
  * Module de gestion des inodes.
  * Fournit des fonctions pour créer, détruite et manipuler des inodes.
  **/
- #ifndef __INODE_H__
+#ifndef __INODE_H__
 #define __INODE_H__
 
 #include <time.h>
@@ -79,7 +79,7 @@ extern long Taille(tInode inode);
 
 /* V1
  * Récupère le type du fichier associé à un inode.
- * Entrée : l'inode pour lequel on souhaite connaître le type de fichier associé
+ * Entrée : l'inode pour lequel on souhaite connaître le tyep de fichier associé
  * Retour : le type du fichier associé à l'inode
  */
 extern natureFichier Type(tInode inode);
