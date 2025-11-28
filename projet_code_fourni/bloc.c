@@ -82,3 +82,51 @@ long LireContenuBloc(tBloc bloc, unsigned char *contenu, long taille) {
 
     return octetsALire;
 }
+
+/* V3
+ * Sauvegarde les données d'un bloc en les écrivant dans un fichier (sur disque).
+ * Entrées : le bloc à sauvegarder, sa taille en octets, le nom du fichier cible
+ * Retour : 0 en cas de succès, -1 en cas d'erreur
+ */
+int SauvegarderBloc(tBloc bloc, long taille, FILE *fichier) {
+    if (bloc == NULL || fichier == NULL) {
+        return -1;
+    }
+
+    long octetsASauver = taille;
+    if (octetsASauver > TAILLE_BLOC) {
+        octetsASauver = TAILLE_BLOC;
+    }
+
+    size_t ecrits = fwrite(bloc, 1, octetsASauver, fichier);
+
+    if (ecrits != (size_t)octetsASauver) {
+        return -1;
+    }
+
+    return 0;
+}
+/* V3
+ * Charge dans un bloc les données lues dans un fichier (sur disque).
+ * Entrées : le bloc dans lequel charger, la taille en octets du fichier contenant les données, son nom (sur le disque))
+ * Retour : 0 en cas de succès, -1 en cas d'erreur
+ */
+int ChargerBloc(tBloc bloc, long taille, FILE *fichier) {
+    if (bloc == NULL || fichier == NULL) {
+        return -1;
+    }
+
+    long octetsACharger = taille;
+    if (octetsACharger > TAILLE_BLOC) {
+        octetsACharger = TAILLE_BLOC;
+    }
+
+
+    size_t lus = fread(bloc, 1, octetsACharger, fichier);
+
+    if (lus != (size_t)octetsACharger) {
+        return -1;
+    }
+
+    return 0;
+}

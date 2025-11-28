@@ -44,4 +44,18 @@ extern long EcrireContenuBloc (tBloc bloc, unsigned char *contenu, long taille);
  */
 extern long LireContenuBloc(tBloc bloc, unsigned char *contenu, long taille);
 
+/* V3
+ * Sauvegarde les données d'un bloc en les écrivant dans un fichier (sur disque).
+ * Entrées : le bloc à sauvegarder, sa taille en octets, le nom du fichier cible
+ * Retour : 0 en cas de succès, -1 en cas d'erreur
+ */
+extern int SauvegarderBloc(tBloc bloc, long taille, FILE *fichier);
+
+/* V3
+ * Charge dans un bloc les données lues dans un fichier (sur disque).
+ * Entrées : le bloc dans lequel charger, la taille en octets du fichier contenant les données, son nom (sur le disque))
+ * Retour : 0 en cas de succès, -1 en cas d'erreur
+ */
+extern int ChargerBloc(tBloc bloc, long taille, FILE *fichier);
+
 #endif

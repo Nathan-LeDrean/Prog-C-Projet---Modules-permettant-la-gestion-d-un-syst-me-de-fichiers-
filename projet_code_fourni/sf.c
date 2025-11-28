@@ -62,14 +62,15 @@ struct sSF
 * Sortie : le super-bloc, ou NULL en cas de problème
 */
 static tSuperBloc CreerSuperBloc(char nomDisque[]) {
-    tSuperBloc sb;
-    time_t t;
-
-    sb = (tSuperBloc)malloc(sizeof(struct sSuperBloc));
+    tSuperBloc sb = (tSuperBloc)malloc(sizeof(struct sSuperBloc));
     
     if (sb == NULL) {
         fprintf(stderr, "CreerSuperBloc : probleme creation\n");
         return NULL;
+    }
+
+    for (int i = 0; i <= TAILLE_NOM_DISQUE; i++) {
+        sb->nomDisque[i] = '\0';
     }
 
     for (int i = 0; i < TAILLE_NOM_DISQUE && nomDisque[i] != '\0'; i++){
@@ -77,7 +78,7 @@ static tSuperBloc CreerSuperBloc(char nomDisque[]) {
     }
     sb->nomDisque[TAILLE_NOM_DISQUE] = '\0'; 
 
-    t = time(NULL);
+    time_t t = time(NULL);
     sb->dateDerModif = t;
 
     return sb;
@@ -190,14 +191,13 @@ void AfficherSF (tSF sf) {
  * Sortie : le nombre d'octets effectivement écrits, -1 en cas d'erreur.
  */
 long Ecrire1BlocFichierSF(tSF sf, char nomFichier[], natureFichier type) {
-    FILE *fichierReel;
     unsigned char buffer[TAILLE_BLOC];
 
     if (sf == NULL) {
         return -1;
     }
 
-    fichierReel = fopen(nomFichier, "rb");
+    FILE *fichierReel = fopen(nomFichier, "rb");
     
     if (fichierReel == NULL) {
         perror("Erreur ouverture fichier"); 
@@ -238,3 +238,186 @@ long Ecrire1BlocFichierSF(tSF sf, char nomFichier[], natureFichier type) {
 
     return octetsEcrits;
 }
+
+/* V3
+ * Ecrit un fichier (d'un nombre de blocs quelconque) dans le système de fichiers.
+ * Si la taille du fichier à écrire dépasse la taille maximale d'un fichier dans le SF(10 x 64 octets),
+ * seuls les 640 premiers octets seront écrits dans le système de fichiers.
+ * Entrées : le système de fichiers, le nom du fichier (sur disque) et son type dans le SF (simulé)
+ * Sortie : le nombre d'octets effectivement écrits, -1 en cas d'erreur.
+ */
+long EcrireFichierSF(tSF sf, char nomFichier[], natureFichier type) {
+    unsigned char buffer[640];
+
+    if (sf == NULL){
+        return -1;
+    }
+
+    FILE *fichierReel = fopen(nomFichier, "rb");
+
+    if (fichierReel == NULL) {
+        perror("Erreur ouverture fichier");
+        return -1;
+    }
+
+    long octetsLus = fread(buffer, 1, 640, fichierReel);
+    fclose(fichierReel);
+    tInode nouvelInode = CreerInode(sf->listeInodes.nbInodes, type);
+
+    if (nouvelInode == NULL){
+        return -1;
+    }
+
+    long octetsEcrits = EcrireDonneesInode(nouvelInode, buffer, octetsLus, 0);
+    struct sListeInodesElement *nouveauMaillon = (struct sListeInodesElement *)malloc(sizeof(struct sListeInodesElement));
+
+    if (nouveauMaillon == NULL) {
+        DetruireInode(&nouvelInode);
+        return -1;
+    }
+    nouveauMaillon->inode = nouvelInode;
+    nouveauMaillon->suivant = NULL;
+
+    if (sf->listeInodes.premier == NULL) {
+        sf->listeInodes.premier = nouveauMaillon;
+        sf->listeInodes.dernier = nouveauMaillon;
+    } else {
+        sf->listeInodes.dernier->suivant = nouveauMaillon;
+        sf->listeInodes.dernier = nouveauMaillon;
+    }
+    sf->listeInodes.nbInodes++;
+
+    time_t t = time(NULL);
+    sf->superBloc->dateDerModif = t;
+    return octetsEcrits;
+}
+/* V3
+ * Sauvegarde un système de fichiers dans un fichier (sur disque).
+ * Entrées : le système de fichiers, le nom du fichier sauvegarde (sur disque)
+ * Sortie : 0 en cas de succèe, -1 en cas d'erreur
+ */
+int SauvegarderSF(tSF sf, char nomFichier[]) {
+    if (sf == NULL){
+        return -1;
+    }
+
+    FILE *f = fopen(nomFichier, "wb");
+
+    if (f == NULL){
+        return -1;
+    }
+
+    int erreur = 0;
+
+    if (fwrite(sf->superBloc, sizeof(struct sSuperBloc), 1, f) != 1){
+        erreur = 1;
+    }
+
+    if (!erreur && fwrite(&(sf->listeInodes.nbInodes), sizeof(int), 1, f) != 1){
+        erreur = 1;
+    }
+
+    if (erreur) {
+        fclose(f);
+        return -1;
+    }
+
+    struct sListeInodesElement *courant = sf->listeInodes.premier;
+
+    while (courant != NULL && erreur == 0) {
+        if (SauvegarderInode(courant->inode, f) == -1) {
+            erreur = 1;
+        }
+        courant = courant->suivant;
+    }
+
+    fclose(f);
+    if (erreur){
+        return -1;
+    }
+    return 0;
+}
+
+/* V3
+ * Restaure le contenu d'un système de fichiers depuis un fichier sauvegarde (sur disque).
+ * Entrées : le système de fichiers où restaurer, le nom du fichier sauvegarde (sur disque)
+ * Sortie : 0 en cas de succèe, -1 en cas d'erreur
+ */
+int ChargerSF(tSF *pSF, char nomFichier[]) {
+    FILE *f = fopen(nomFichier, "rb");
+    
+    if (f == NULL){
+        return -1;
+    }
+
+    int erreur = 0;
+    tSF sf = (tSF)malloc(sizeof(struct sSF));
+    if (sf == NULL){
+        fclose(f); 
+        return -1;
+    }
+
+    sf->superBloc = (tSuperBloc)malloc(sizeof(struct sSuperBloc));
+    if (sf->superBloc == NULL){ 
+        free(sf); 
+        fclose(f); 
+        return -1;
+    }
+
+    int nbInodesACharger;
+
+    if (fread(sf->superBloc, sizeof(struct sSuperBloc), 1, f) != 1){
+        erreur = 1;
+    }
+
+    if (!erreur && fread(&nbInodesACharger, sizeof(int), 1, f) != 1){
+        erreur = 1;
+    }
+
+    if (erreur) {
+        free(sf->superBloc);
+        free(sf);
+        fclose(f);
+        return -1;
+    }
+
+    sf->listeInodes.premier = NULL;
+    sf->listeInodes.dernier = NULL;
+    sf->listeInodes.nbInodes = 0;
+
+    for (int i = 0; i < nbInodesACharger && erreur == 0; i++) {
+        tInode inodeTemp;
+        if (ChargerInode(&inodeTemp, f) == -1) {
+            erreur = 1;
+        } else {
+            struct sListeInodesElement *nouveauMaillon = (struct sListeInodesElement *)malloc(sizeof(struct sListeInodesElement));
+            if (nouveauMaillon == NULL) {
+                DetruireInode(&inodeTemp);
+                erreur = 1;
+            } else {
+                nouveauMaillon->inode = inodeTemp;
+                nouveauMaillon->suivant = NULL;
+
+                if (sf->listeInodes.premier == NULL) {
+                    sf->listeInodes.premier = nouveauMaillon;
+                    sf->listeInodes.dernier = nouveauMaillon;
+                } else {
+                    sf->listeInodes.dernier->suivant = nouveauMaillon;
+                    sf->listeInodes.dernier = nouveauMaillon;
+                }
+                sf->listeInodes.nbInodes++;
+            }
+        }
+    }
+
+    fclose(f);
+
+    if (erreur) {
+        DetruireSF(&sf); 
+        return -1;
+    }
+
+    *pSF = sf;
+    return 0;
+}
+

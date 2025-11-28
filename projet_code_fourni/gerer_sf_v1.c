@@ -20,7 +20,7 @@ int main(void) {
     AfficherInode(monInode);
 
     // 3. Écriture de données
-    char message[] = "Bonjour, ceci est un test d'ecriture dans le bloc 0.";
+    char message = "Bonjour, ceci est un test d'ecriture dans le bloc 0.";
     long tailleMsg = strlen(message) + 1; 
 
     printf("\n[2] Ecriture de %ld octets : \"%s\"\n", tailleMsg, message);
@@ -38,7 +38,7 @@ int main(void) {
 
     // 5. Lecture pour vérification
     printf("\n[3] Lecture des donnees...\n");
-    unsigned char buffer[TAILLE_BLOC]; // Tableau statique sur la pile
+    unsigned char buffer[TAILLE_BLOC]; 
     long lus = LireDonneesInode1bloc(monInode, buffer, tailleMsg);
     
     if (lus > 0) {

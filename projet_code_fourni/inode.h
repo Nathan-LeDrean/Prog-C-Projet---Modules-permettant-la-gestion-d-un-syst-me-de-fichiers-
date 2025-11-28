@@ -107,4 +107,36 @@ extern long LireDonneesInode1bloc(tInode inode, unsigned char *contenu, long tai
  */
 extern long EcrireDonneesInode1bloc(tInode inode, unsigned char *contenu, long taille);
 
+/* V3
+ * Lit les données d'un inode avec décalage, et les stocke à une adresse donnée
+ * Entrées : l'inode d'où les données sont lues, la zone où recopier ces données, la taille en octets
+ * des données à lire et le décalage à appliquer (voir énoncé)
+ * Sortie : le nombre d'octets effectivement lus, 0 si le décalage est au-delà de la taille
+ */
+extern long LireDonneesInode(tInode inode, unsigned char *contenu, long taille, long decalage);
+
+/* V3
+ * Ecrit dans un inode, avec décalage, ls données stockées à une adresse donnée
+ * Entrées : l'inode où écrire le contenu, l'adesse de la zone depuis laquelle lire les données, la taille en octets
+ * de ces données et le décalage à appliquer (voir énoncé)
+ * Sortie : le nombre d'octets effectivement écrits, ou -1 en cas d'erreur
+ */
+extern long EcrireDonneesInode(tInode inode, unsigned char *contenu, long taille, long decalage);
+
+/* V3
+ * Sauvegarde toutes les informations contenues dans un inode dans un fichier (sur disque,
+ * et préalablement ouvert en écriture et en mode binaire)
+ * Entrées : l'inode concerné, l'identificateur du fichier
+ * Sortie : 0 en cas de succès, -1 en cas d'erreur
+ */
+extern int SauvegarderInode(tInode inode, FILE *fichier);
+
+/* V3
+ * Charge toutes les informations d'un inode à partir d'un fichier (sur disque,
+ * et préalablement ouvert en lecture et en mode binaire)
+ * Entrées : l'inode concerné, l'identificateur du fichier
+ * Sortie : 0 en cas de succès, -1 en cas d'erreur
+ */
+extern int ChargerInode(tInode *pInode, FILE *fichier);
+
 #endif

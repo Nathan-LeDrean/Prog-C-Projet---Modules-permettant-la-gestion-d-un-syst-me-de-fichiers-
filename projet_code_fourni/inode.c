@@ -36,8 +36,6 @@ struct sInode
  * Retour : l'inode créé ou NULL en cas de problème
  */
 tInode CreerInode(int numInode, natureFichier type) {
-    time_t t;
-
     tInode inode = (tInode)malloc(sizeof(struct sInode));
 
     if (inode == NULL) {
@@ -53,7 +51,7 @@ tInode CreerInode(int numInode, natureFichier type) {
         inode->blocDonnees[i] = NULL;
     }
 
-    t = time(NULL);
+    time_t t = time(NULL);
     inode->dateDerAcces = t;
     inode->dateDerModif = t;
     inode->dateDerModifInode = t;
@@ -183,8 +181,6 @@ long LireDonneesInode1bloc(tInode inode, unsigned char *contenu, long taille) {
  * Retour : le nombre d'octets effectivement écrits dans l'inode ou -1 en cas d'erreur
  */
 long EcrireDonneesInode1bloc(tInode inode, unsigned char *contenu, long taille) {
-    time_t t;
-
     if (inode == NULL) {
         return -1;
     }
@@ -202,9 +198,255 @@ long EcrireDonneesInode1bloc(tInode inode, unsigned char *contenu, long taille) 
         inode->taille = octetsEcrits;
     }
 
-    t = time(NULL);
+    time_t t = time(NULL);
     inode->dateDerModif = t;
     inode->dateDerModifInode = t;
 
     return octetsEcrits;
+}
+
+/* V3
+ * Lit les données d'un inode avec décalage, et les stocke à une adresse donnée
+ * Entrées : l'inode d'où les données sont lues, la zone où recopier ces données, la taille en octets
+ * des données à lire et le décalage à appliquer (voir énoncé)
+ * Sortie : le nombre d'octets effectivement lus, 0 si le décalage est au-delà de la taille
+ */
+long LireDonneesInode(tInode inode, unsigned char *contenu, long taille, long decalage) {
+    long octetsLusTotal = 0;
+    long octetsALireDansBloc;
+    unsigned char bufferTemp[TAILLE_BLOC];
+    int continuer = 1; 
+
+    if (inode == NULL || decalage >= inode->taille) {
+        return 0;
+    }
+
+    int indexBloc = decalage / TAILLE_BLOC, offsetDansBloc = decalage % TAILLE_BLOC;
+
+    while (octetsLusTotal < taille && indexBloc < NB_BLOCS_DIRECTS && continuer == 1) {
+        
+        if (inode->blocDonnees[indexBloc] == NULL) {
+            continuer = 0;
+        } else {
+            octetsALireDansBloc = TAILLE_BLOC - offsetDansBloc;
+            
+            if (octetsALireDansBloc > (taille - octetsLusTotal)) {
+                octetsALireDansBloc = taille - octetsLusTotal;
+            }
+            
+            if ((decalage + octetsLusTotal + octetsALireDansBloc) > inode->taille) {
+                octetsALireDansBloc = inode->taille - (decalage + octetsLusTotal);
+            }
+
+            if (octetsALireDansBloc <= 0) {
+                continuer = 0; // Remplace le break
+            } else {
+                LireContenuBloc(inode->blocDonnees[indexBloc], bufferTemp, TAILLE_BLOC);
+
+                for (int i = 0; i < octetsALireDansBloc; i++) {
+                    contenu[octetsLusTotal + i] = bufferTemp[offsetDansBloc + i];
+                }
+
+                octetsLusTotal += octetsALireDansBloc;
+                indexBloc++;
+                offsetDansBloc = 0;
+            }
+        }
+    }
+
+    inode->dateDerAcces = time(NULL);
+    return octetsLusTotal;
+}
+
+/* V3
+ * Ecrit dans un inode, avec décalage, ls données stockées à une adresse donnée
+ * Entrées : l'inode où écrire le contenu, l'adesse de la zone depuis laquelle lire les données, la taille en octets
+ * de ces données et le décalage à appliquer (voir énoncé)
+ * Sortie : le nombre d'octets effectivement écrits, ou -1 en cas d'erreur
+ */
+long EcrireDonneesInode(tInode inode, unsigned char *contenu, long taille, long decalage) {
+    long octetsEcritsTotal = 0;
+    long octetsAEcrireDansBloc;
+    unsigned char bufferTemp[TAILLE_BLOC];
+
+
+    if (inode == NULL){
+        return -1;
+    }
+    
+    if (decalage > inode->taille) {
+        decalage = inode->taille; 
+    }
+
+    int indexBloc = decalage / TAILLE_BLOC, offsetDansBloc = decalage % TAILLE_BLOC;
+
+    while (octetsEcritsTotal < taille && indexBloc < NB_BLOCS_DIRECTS) {
+        if (inode->blocDonnees[indexBloc] == NULL) {
+            inode->blocDonnees[indexBloc] = CreerBloc();
+            if (inode->blocDonnees[indexBloc] == NULL){
+                return -1;
+            }
+        }
+
+        LireContenuBloc(inode->blocDonnees[indexBloc], bufferTemp, TAILLE_BLOC);
+        octetsAEcrireDansBloc = TAILLE_BLOC - offsetDansBloc;
+
+        if (octetsAEcrireDansBloc > (taille - octetsEcritsTotal)) {
+            octetsAEcrireDansBloc = taille - octetsEcritsTotal;
+        }
+
+        for (int i = 0; i < octetsAEcrireDansBloc; i++) {
+            bufferTemp[offsetDansBloc + i] = contenu[octetsEcritsTotal + i];
+        }
+
+        EcrireContenuBloc(inode->blocDonnees[indexBloc], bufferTemp, TAILLE_BLOC);
+        octetsEcritsTotal += octetsAEcrireDansBloc;
+        indexBloc++;
+        offsetDansBloc = 0;
+    }
+
+    if ((decalage + octetsEcritsTotal) > inode->taille) {
+        inode->taille = decalage + octetsEcritsTotal;
+    }
+
+    time_t t = time(NULL);
+    inode->dateDerModif = t;
+    inode->dateDerModifInode = t;
+
+    return octetsEcritsTotal;
+}
+
+/* V3
+ * Sauvegarde toutes les informations contenues dans un inode dans un fichier (sur disque,
+ * et préalablement ouvert en écriture et en mode binaire)
+ * Entrées : l'inode concerné, l'identificateur du fichier
+ * Sortie : 0 en cas de succès, -1 en cas d'erreur
+ */
+int SauvegarderInode(tInode inode, FILE *fichier) {
+    int blocExiste;
+
+    if (inode == NULL || fichier == NULL) {
+        return -1;
+    }
+    int erreur = 0;
+
+    if (fwrite(&(inode->numero), sizeof(unsigned int), 1, fichier) != 1) {
+        erreur = 1;
+    }
+
+    if (!erreur && fwrite(&(inode->type), sizeof(natureFichier), 1, fichier) != 1){
+        erreur = 1;
+    }
+
+    if (!erreur && fwrite(&(inode->taille), sizeof(long), 1, fichier) != 1){
+        erreur = 1;
+    }
+
+    if (!erreur && fwrite(&(inode->dateDerAcces), sizeof(time_t), 1, fichier) != 1){
+        erreur = 1;
+    }
+
+    if (!erreur && fwrite(&(inode->dateDerModif), sizeof(time_t), 1, fichier) != 1){
+        erreur = 1;
+    }
+
+    if (!erreur && fwrite(&(inode->dateDerModifInode), sizeof(time_t), 1, fichier) != 1){
+        erreur = 1;
+    }
+
+    if (erreur){
+        return -1;
+    }
+
+    for (int i = 0; i < NB_BLOCS_DIRECTS && erreur == 0; i++) {
+        blocExiste = (inode->blocDonnees[i] != NULL) ? 1 : 0;
+        
+        if (fwrite(&blocExiste, sizeof(int), 1, fichier) != 1) {
+            erreur = 1;
+        } else {
+            if (blocExiste) {
+                if (SauvegarderBloc(inode->blocDonnees[i], TAILLE_BLOC, fichier) == -1) {
+                    erreur = 1;
+                }
+            }
+        }
+    }
+
+    if (erreur){
+        return -1;
+    }
+    return 0;
+}
+
+/* V3
+ * Charge toutes les informations d'un inode à partir d'un fichier (sur disque,
+ * et préalablement ouvert en lecture et en mode binaire)
+ * Entrées : l'inode concerné, l'identificateur du fichier
+ * Sortie : 0 en cas de succès, -1 en cas d'erreur
+ */
+int ChargerInode(tInode *pInode, FILE *fichier) {
+    int blocExiste;
+
+    if (pInode == NULL || fichier == NULL) return -1;
+
+    int erreur = 0;
+    tInode inode = (tInode)malloc(sizeof(struct sInode));
+    if (inode == NULL) return -1;
+
+    for (int i = 0; i < NB_BLOCS_DIRECTS; i++) {
+        inode->blocDonnees[i] = NULL;
+    }
+
+    if (fread(&(inode->numero), sizeof(unsigned int), 1, fichier) != 1){
+        erreur = 1;
+    } 
+
+    if (!erreur && fread(&(inode->type), sizeof(natureFichier), 1, fichier) != 1){
+        erreur = 1;
+    }
+
+    if (!erreur && fread(&(inode->taille), sizeof(long), 1, fichier) != 1){
+        erreur = 1;
+    }
+
+    if (!erreur && fread(&(inode->dateDerAcces), sizeof(time_t), 1, fichier) != 1){
+        erreur = 1;
+    }
+
+    if (!erreur && fread(&(inode->dateDerModif), sizeof(time_t), 1, fichier) != 1){
+        erreur = 1;
+    }
+    if (!erreur && fread(&(inode->dateDerModifInode), sizeof(time_t), 1, fichier) != 1){
+        erreur = 1;
+    }
+
+    if (erreur) {
+        free(inode);
+        return -1;
+    }
+
+    for (int i = 0; i < NB_BLOCS_DIRECTS && erreur == 0; i++) {
+        if (fread(&blocExiste, sizeof(int), 1, fichier) != 1) {
+            erreur = 1;
+        } else {
+            if (blocExiste) {
+                inode->blocDonnees[i] = CreerBloc();
+                if (inode->blocDonnees[i] == NULL) {
+                    erreur = 1;
+                } else {
+                    if (ChargerBloc(inode->blocDonnees[i], TAILLE_BLOC, fichier) == -1) {
+                        erreur = 1;
+                    }
+                }
+            }
+        }
+    }
+
+    if (erreur) {
+        DetruireInode(&inode);
+        return -1;
+    }
+
+    *pInode = inode;
+    return 0;
 }
