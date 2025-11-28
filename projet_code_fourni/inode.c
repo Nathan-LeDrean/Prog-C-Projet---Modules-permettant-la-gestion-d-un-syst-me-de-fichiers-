@@ -156,6 +156,16 @@ void AfficherInode(tInode inode) {
     printf("date dernier accès : %s", ctime(&(inode->dateDerAcces)));
     printf("date dernière modification : %s", ctime(&(inode->dateDerModif)));
     printf("date dernière modification inode : %s", ctime(&(inode->dateDerModifInode)));
+
+    printf("Donnees :\n");
+    unsigned char buffer[TAILLE_BLOC];
+    for (int i = 0; i < NB_BLOCS_DIRECTS; i++) {
+        if (inode->blocDonnees[i] != NULL) {
+            LireContenuBloc(inode->blocDonnees[i], buffer, TAILLE_BLOC);
+            fwrite(buffer, 1, TAILLE_BLOC, stdout);
+        }
+    }
+    printf("\n");
 }
 
 /* V1
