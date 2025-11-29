@@ -51,11 +51,11 @@ int main(void) {
 
     // 4. Test de la commande Ls (mode simple)
     printf("\n[4] LS Simple :\n");
-    Ls(sf, false);
+    Ls(sf, 1);
 
     // 5. Test de la commande Ls (mode détail)
     printf("\n[5] LS Detail :\n");
-    Ls(sf, true);
+    Ls(sf, 0);
 
     // 6. Sauvegarde du SF
     printf("\n[6] Sauvegarde SF vers '%s'...\n", save);
@@ -72,7 +72,7 @@ int main(void) {
     if (ChargerSF(&sf, save) == 0) {
         printf("Chargement reussi.\n");
         printf("\n[9] LS Detail apres rechargement :\n");
-        Ls(sf, true);
+        Ls(sf, 0);
         
         DetruireSF(&sf);
     } else {

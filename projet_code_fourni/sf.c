@@ -252,7 +252,9 @@ long EcrireFichierSF(tSF sf, char nomFichier[], natureFichier type) {
     unsigned char *buffer = malloc(tailleFichier);
 
     if (fread(buffer, 1, tailleFichier, f) != (size_t)tailleFichier) {
-        free(buffer); fclose(f); return -1;
+        free(buffer); 
+        fclose(f); 
+        return -1;
     }
 
     fclose(f);
