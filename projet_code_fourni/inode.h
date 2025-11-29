@@ -139,4 +139,11 @@ extern int SauvegarderInode(tInode inode, FILE *fichier);
  */
 extern int ChargerInode(tInode *pInode, FILE *fichier);
 
+/* V4
+ * Retourne la taille maximale d'un fichier contenu dans un inode.
+ * Entrée : l'inode concerné,
+ * Sortie : la taille du plus grand fichier de cet inode
+ */
+extern long TailleMaxFichier(void);
+
 #endif

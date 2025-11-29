@@ -12,7 +12,7 @@ int main(void) {
     tInode monInode = CreerInode(1, ORDINAIRE);
 
     if (monInode == NULL) {
-        return EXIT_FAILURE;
+        return 1;
     }
 
     // 2. Affichage avant écriture
@@ -20,7 +20,7 @@ int main(void) {
     AfficherInode(monInode);
 
     // 3. Écriture de données
-    char message = "Bonjour, ceci est un test d'ecriture dans le bloc 0.";
+    char message[] = "Bonjour, ceci est un test d'ecriture dans le bloc 0.";
     long tailleMsg = strlen(message) + 1; 
 
     printf("\n[2] Ecriture de %ld octets : \"%s\"\n", tailleMsg, message);
@@ -54,5 +54,5 @@ int main(void) {
     }
 
     printf("\n--- FIN TEST VERSION 1 ---\n");
-    return EXIT_SUCCESS;
+    return 0;
 }

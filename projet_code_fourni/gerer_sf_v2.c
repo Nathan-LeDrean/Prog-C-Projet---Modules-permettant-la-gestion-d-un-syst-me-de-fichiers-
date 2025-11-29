@@ -25,7 +25,7 @@ int main(void) {
     f = fopen(nomFichierTest, "w"); 
     if (f == NULL) {
         fprintf(stderr, "Erreur creation fichier test\n");
-        return EXIT_FAILURE;
+        return 1;
     }
 
     fprintf(f, "%s", contenuTest);
@@ -37,7 +37,7 @@ int main(void) {
 
     if (monSF == NULL) {
         fprintf(stderr, "Erreur fatale : Echec creation SF.\n");
-        return EXIT_FAILURE;
+        return 1;
     }
 
     AfficherSF(monSF);
@@ -70,5 +70,5 @@ int main(void) {
     remove(nomFichierTest); 
 
     printf("\n--- FIN TEST VERSION 2 ---\n");
-    return EXIT_SUCCESS;
+    return 0;
 }

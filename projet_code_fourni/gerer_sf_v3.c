@@ -60,5 +60,5 @@ int main(void) {
     remove(fichierSauvegarde);
     
     printf("\n--- FIN TEST VERSION 3 ---\n");
-    return EXIT_SUCCESS;
+    return 0;
 }

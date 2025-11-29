@@ -4,10 +4,10 @@
  * Fichier : bloc.c
  * Module de gestion des blocs de données.
  **/
-
-#include <stdlib.h> 
-#include <stdio.h> 
-#include <string.h> 
+ 
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 #include "bloc.h"
 
 /* V1
@@ -22,6 +22,7 @@ tBloc CreerBloc(void) {
         fprintf(stderr, "CreerBloc: probleme creation\n");
         return NULL;
     }
+    memset(bloc, 0, TAILLE_BLOC);
     return bloc;
 }
 
@@ -44,20 +45,20 @@ void DetruireBloc(tBloc *pBloc) {
  * Retour : le nombre d'octets effectivement écrits dans le bloc
  */
 long EcrireContenuBloc(tBloc bloc, unsigned char *contenu, long taille) {
-    if (bloc == NULL || contenu == NULL) {
-        return 0;
+    if (bloc == NULL || contenu == NULL){
+        return -1;
     }
+    
+    long aCopier;
 
-    long octetsAEcrire = taille;
     if (taille > TAILLE_BLOC) {
-        octetsAEcrire = TAILLE_BLOC;
+        aCopier = TAILLE_BLOC;
+    } else {
+        aCopier = taille;
     }
 
-    for (int i = 0; i < octetsAEcrire; i++) {
-        bloc[i] = contenu[i];
-    }
-
-    return octetsAEcrire;
+    memcpy(bloc, contenu, aCopier);
+    return aCopier;
 }
 
 /* V1
@@ -68,19 +69,18 @@ long EcrireContenuBloc(tBloc bloc, unsigned char *contenu, long taille) {
  */
 long LireContenuBloc(tBloc bloc, unsigned char *contenu, long taille) {
     if (bloc == NULL || contenu == NULL) {
-        return 0;
+        return -1;
     }
 
-    long octetsALire = taille;
+    long aCopier;
     if (taille > TAILLE_BLOC) {
-        octetsALire = TAILLE_BLOC;
+        aCopier = TAILLE_BLOC;
+    } else {
+        aCopier = taille;
     }
 
-    for (int i = 0; i < octetsALire; i++) {
-        contenu[i] = bloc[i];
-    }
-
-    return octetsALire;
+    memcpy(contenu, bloc, aCopier);
+    return aCopier;
 }
 
 /* V3
@@ -93,17 +93,11 @@ int SauvegarderBloc(tBloc bloc, long taille, FILE *fichier) {
         return -1;
     }
 
-    long octetsASauver = taille;
-    if (octetsASauver > TAILLE_BLOC) {
-        octetsASauver = TAILLE_BLOC;
-    }
-
-    size_t ecrits = fwrite(bloc, 1, octetsASauver, fichier);
-
-    if (ecrits != (size_t)octetsASauver) {
+    if (fwrite(bloc, 1, TAILLE_BLOC, fichier) != TAILLE_BLOC) {
         return -1;
     }
-
+    
+    (void)taille; 
     return 0;
 }
 /* V3
@@ -116,17 +110,10 @@ int ChargerBloc(tBloc bloc, long taille, FILE *fichier) {
         return -1;
     }
 
-    long octetsACharger = taille;
-    if (octetsACharger > TAILLE_BLOC) {
-        octetsACharger = TAILLE_BLOC;
-    }
-
-
-    size_t lus = fread(bloc, 1, octetsACharger, fichier);
-
-    if (lus != (size_t)octetsACharger) {
+    if (fread(bloc, 1, TAILLE_BLOC, fichier) != TAILLE_BLOC) {
         return -1;
     }
-
+    
+    (void)taille;
     return 0;
 }

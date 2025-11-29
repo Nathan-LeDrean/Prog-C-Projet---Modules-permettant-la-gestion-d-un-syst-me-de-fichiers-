@@ -70,4 +70,14 @@ int SauvegarderSF(tSF sf, char nomFichier[]);
  */
 int ChargerSF(tSF *pSF, char nomFichier[]);
 
+/* V4
+ * Affiche le détail du répertoire racine d'un système de fichiers.
+ * Entrées : le système de fichiers,
+ * et un booléen indiquant si l'affichage doit être détaillé (true) ou non (false),
+ * voir l'énoncé pour les consignes d'affichage à suivre
+ * Sortie : 0 en cas de succès, -1 en cas d'erreur
+ */
+extern int Ls (tSF sf, bool detail);
+
+
 #endif

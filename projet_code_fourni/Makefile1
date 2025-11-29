@@ -1,21 +1,20 @@
 CC=gcc
-CFLAGS=-Wall -Wpedantic -std=c11 -Wextra -g -Wextra
+CFLAGS=-Wall -Wpedantic -std=c11 -Wextra -g
 RM=rm -f
-DEPS= bloc.h inode.h
-OBJ= bloc.o inode.o gerer_sf_v1.o
+OBJ=bloc.o inode.o gerer_sf_v1.o
 EXE=gerer_sf_v1
 
-$(EXE):  $(OBJ)
+$(EXE): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $(EXE)
 
-gerer_sfv1.o : gerer_sf_v1.c bloc.h inode.h
+gerer_sf_v1.o: gerer_sf_v1.c inode.h bloc.h
 	$(CC) $(CFLAGS) -c gerer_sf_v1.c
 
-bloc.o : bloc.c bloc.h
-	$(CC) $(CFLAGS) -c bloc.c
-
-inode.o : inode.c inode.h bloc.h
+inode.o: inode.c inode.h bloc.h
 	$(CC) $(CFLAGS) -c inode.c
+
+bloc.o: bloc.c bloc.h
+	$(CC) $(CFLAGS) -c bloc.c
 
 .PHONY: clean
 

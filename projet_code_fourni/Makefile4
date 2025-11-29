@@ -1,14 +1,14 @@
 CC=gcc
 CFLAGS=-Wall -Wpedantic -std=c11 -Wextra -g
 RM=rm -f
-OBJ=bloc.o inode.o repertoire.o sf.o gerer_sf_v2.o
-EXE=gerer_sf_v2
+OBJ=bloc.o inode.o repertoire.o sf.o gerer_sf_v4.o
+EXE=gerer_sf_v4
 
 $(EXE): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $(EXE)
 
-gerer_sf_v2.o: gerer_sf_v2.c sf.h inode.h
-	$(CC) $(CFLAGS) -c gerer_sf_v2.c
+gerer_sf_v4.o: gerer_sf_v4.c sf.h inode.h repertoire.h
+	$(CC) $(CFLAGS) -c gerer_sf_v4.c
 
 sf.o: sf.c sf.h inode.h bloc.h repertoire.h
 	$(CC) $(CFLAGS) -c sf.c
