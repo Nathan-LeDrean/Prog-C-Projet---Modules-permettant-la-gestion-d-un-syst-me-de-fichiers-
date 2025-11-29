@@ -2,7 +2,7 @@
  * ProgC - Projet Automne 25-26 : Gestion de systèmes de fichiers
  * VERSION 2
  * Fichier : gerer_sf_v2.c
- * Programme de test pour la version 2 (Système de Fichiers complet).
+ * Programme de test pour la version 2.
  **/
 
 #include <stdio.h>

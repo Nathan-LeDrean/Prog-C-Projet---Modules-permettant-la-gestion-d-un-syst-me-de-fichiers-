@@ -95,6 +95,7 @@ int EcrireEntreeRepertoire(tRepertoire rep, char nomEntree[], unsigned int numer
             if (rep->table[indexLibre] == NULL) {
                 return -1;
             }
+            memset(rep->table[indexLibre], 0, sizeof(struct sEntreesRepertoire));
             strncpy(rep->table[indexLibre]->nomEntree, nomEntree, TAILLE_NOM_FICHIER);
             rep->table[indexLibre]->nomEntree[TAILLE_NOM_FICHIER] = '\0';
             rep->table[indexLibre]->numeroInode = numeroInode;

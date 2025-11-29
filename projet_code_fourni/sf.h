@@ -1,6 +1,6 @@
 /**
  * ProgC - Projet Automne 25-26 : Gestion de systèmes de fichiers
- * VERSION 2
+ * VERSION 4
  * Fichier : sf.h
  * Module de gestion d'un systèmes de fichiers (simulé)
  * Fournit des fonctions pour créer, détruire et manipuler un système de fichiers (simulé).

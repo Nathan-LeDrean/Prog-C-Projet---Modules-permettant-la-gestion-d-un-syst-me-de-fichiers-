@@ -1,6 +1,6 @@
 /**
  * ProgC - Projet Automne 25-26 : Gestion de systèmes de fichiers
- * VERSION 1
+ * VERSION 3
  * Fichier : bloc.c
  * Module de gestion des blocs de données.
  **/

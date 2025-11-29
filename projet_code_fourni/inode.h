@@ -1,6 +1,6 @@
 /**
  * ProgC - Projet Automne 25-26 : Gestion de systèmes de fichiers
- * VERSION 2 = VERSION 1
+ * VERSION 4
  * Fichier : inode.h
  * Module de gestion des inodes.
  * Fournit des fonctions pour créer, détruite et manipuler des inodes.

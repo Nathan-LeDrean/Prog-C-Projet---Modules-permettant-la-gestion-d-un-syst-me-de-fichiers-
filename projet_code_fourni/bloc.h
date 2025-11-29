@@ -1,6 +1,6 @@
 /**
  * ProgC - Projet Automne 25-26 : Gestion de systèmes de fichiers
- * VERSION 1
+ * VERSION 3
  * Fichier : bloc.h
  * Module de gestion des blocs de données.
  * Fournit des fonctions pour créer, détruire, lire et écrire des blocs de données de taille fixe.

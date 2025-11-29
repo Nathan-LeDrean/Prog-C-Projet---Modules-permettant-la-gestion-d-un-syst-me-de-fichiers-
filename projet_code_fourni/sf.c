@@ -1,6 +1,6 @@
 /**
  * ProgC - Projet Automne 25-26 : Gestion de systèmes de fichiers
- * VERSION 2
+ * VERSION 4
  * Fichier : sf.c
  * Module de gestion d'un systèmes de fichiers (simulé)
  **/
@@ -69,6 +69,7 @@ static tSuperBloc CreerSuperBloc(char nomDisque[]) {
         fprintf(stderr, "Creer Super Bloc probleme creation\n");
         return NULL;
     }
+    memset(sb, 0, sizeof(struct sSuperBloc));
     strncpy(sb->nomDisque, nomDisque, TAILLE_NOM_DISQUE);
     sb->nomDisque[TAILLE_NOM_DISQUE] = '\0';
     sb->dateDerModif = time(NULL);

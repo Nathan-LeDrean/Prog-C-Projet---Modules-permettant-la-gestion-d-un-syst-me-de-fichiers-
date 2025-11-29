@@ -1,9 +1,10 @@
 /**
  * ProgC - Projet Automne 25-26 : Gestion de systèmes de fichiers
- * VERSION 1
+ * VERSION 4
  * Fichier : inode.c
  * Module de gestion des inodes.
  **/
+
 #include <stdlib.h> 
 #include <stdio.h>  
 #include <time.h>  
@@ -43,6 +44,8 @@ tInode CreerInode(int numInode, natureFichier type) {
         return NULL;
     }
 
+    memset(inode, 0, sizeof(struct sInode));
+    
     inode->numero = numInode;
     inode->type = type;
     inode->taille = 0;

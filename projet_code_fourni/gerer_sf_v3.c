@@ -1,3 +1,10 @@
+/**
+ * ProgC - Projet Automne 25-26 : Gestion de systèmes de fichiers
+ * VERSION 3
+ * Fichier : gerer_sf_v3.c
+ * Programme de test pour la version 3.
+ **/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

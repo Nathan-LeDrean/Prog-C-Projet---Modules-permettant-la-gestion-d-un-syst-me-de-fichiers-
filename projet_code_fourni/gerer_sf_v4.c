@@ -1,3 +1,10 @@
+/**
+ * ProgC - Projet Automne 25-26 : Gestion de systèmes de fichiers
+ * VERSION 4
+ * Fichier : gerer_sf_v4.c
+ * Programme de test pour la version 4.
+ **/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,6 +20,8 @@ int main(void) {
 
     printf("--- TEST VERSION 4 ---\n");
 
+    // 1. Création de fichiers réels pour le test
+    printf("[1] Creation fichiers reels sur le disque...\n");
     f = fopen(fichier1, "w"); 
     if(f) { 
         fprintf(f, "Miaou"); 
@@ -25,28 +34,50 @@ int main(void) {
         fclose(f); 
     }
 
-    printf("[1] Creation SF (avec racine)...\n");
+    // 2. Création du SF (avec initialisation de la racine)
+    printf("[2] Creation SF (avec racine)...\n");
     sf = CreerSF("DisqueV4");
-    if (sf == NULL) return 1;
+    
+    if (sf == NULL) {
+        remove(fichier1);
+        remove(fichier2);
+        return 1;
+    }
 
-    printf("[2] Ajout fichiers...\n");
+    // 3. Ajout de fichiers dans le SF (et dans le répertoire racine)
+    printf("[3] Ajout fichiers...\n");
     EcrireFichierSF(sf, fichier1, ORDINAIRE);
     EcrireFichierSF(sf, fichier2, ORDINAIRE);
 
-    printf("\n[3] LS Simple :\n");
+    // 4. Test de la commande Ls (mode simple)
+    printf("\n[4] LS Simple :\n");
     Ls(sf, false);
 
-    printf("\n[4] LS Detail :\n");
+    // 5. Test de la commande Ls (mode détail)
+    printf("\n[5] LS Detail :\n");
     Ls(sf, true);
 
-    printf("\n[5] Sauvegarde et rechargement...\n");
-    SauvegarderSF(sf, save);
+    // 6. Sauvegarde du SF
+    printf("\n[6] Sauvegarde SF vers '%s'...\n", save);
+    if (SauvegarderSF(sf, save) == 0) {
+        printf("Sauvegarde reussie.\n");
+    }
+
+    // 7. Destruction du SF en mémoire
+    printf("[7] Destruction SF en memoire...\n");
     DetruireSF(&sf);
     
-    ChargerSF(&sf, save);
-
-    printf("\n[6] LS Detail apres rechargement :\n");
-    Ls(sf, true);
+    // 8. Chargement du SF depuis le fichier de sauvegarde
+    printf("[8] Chargement SF depuis '%s'...\n", save);
+    if (ChargerSF(&sf, save) == 0) {
+        printf("Chargement reussi.\n");
+        printf("\n[9] LS Detail apres rechargement :\n");
+        Ls(sf, true);
+        
+        DetruireSF(&sf);
+    } else {
+        printf("Echec chargement.\n");
+    }
 
     DetruireSF(&sf);
     remove(fichier1); 
