@@ -159,9 +159,9 @@ void AfficherInode(tInode inode) {
     printf("  date dernier accès : %s", ctime(&(inode->dateDerAcces)));
     printf("  date dernière modification : %s", ctime(&(inode->dateDerModif)));
     printf("  date dernière modification inode : %s", ctime(&(inode->dateDerModifInode)));
-
     printf("Donnees :\n");
     unsigned char buffer[TAILLE_BLOC];
+
     for (int i = 0; i < NB_BLOCS_DIRECTS; i++) {
         if (inode->blocDonnees[i] != NULL) {
             LireContenuBloc(inode->blocDonnees[i], buffer, TAILLE_BLOC);
@@ -197,50 +197,50 @@ long EcrireDonneesInode1bloc(tInode inode, unsigned char *contenu, long taille) 
  * Sortie : le nombre d'octets effectivement lus, 0 si le décalage est au-delà de la taille
  */
 long LireDonneesInode(tInode inode, unsigned char *contenu, long taille, long decalage) {
-    long octetsLusTotal = 0;
-    long octetsALireDansBloc;
-    unsigned char bufferTemp[TAILLE_BLOC];
+    long nbOctetsLus = 0;
+    long nbOctetsALire;
+    unsigned char buffer[TAILLE_BLOC];
     int continuer = 1; 
 
     if (inode == NULL || decalage >= inode->taille) {
         return 0;
     }
 
-    int indexBloc = decalage / TAILLE_BLOC, offsetDansBloc = decalage % TAILLE_BLOC;
+    int iBloc = decalage / TAILLE_BLOC, decalageBloc = decalage % TAILLE_BLOC;
 
-    while (octetsLusTotal < taille && indexBloc < NB_BLOCS_DIRECTS && continuer == 1) {
+    while (nbOctetsLus < taille && iBloc < NB_BLOCS_DIRECTS && continuer == 1) {
         
-        if (inode->blocDonnees[indexBloc] == NULL) {
+        if (inode->blocDonnees[iBloc] == NULL) {
             continuer = 0;
         } else {
-            octetsALireDansBloc = TAILLE_BLOC - offsetDansBloc;
+            nbOctetsALire = TAILLE_BLOC - decalageBloc;
             
-            if (octetsALireDansBloc > (taille - octetsLusTotal)) {
-                octetsALireDansBloc = taille - octetsLusTotal;
+            if (nbOctetsALire > (taille - nbOctetsLus)) {
+                nbOctetsALire = taille - nbOctetsLus;
             }
             
-            if ((decalage + octetsLusTotal + octetsALireDansBloc) > inode->taille) {
-                octetsALireDansBloc = inode->taille - (decalage + octetsLusTotal);
+            if ((decalage + nbOctetsLus + nbOctetsALire) > inode->taille) {
+                nbOctetsALire = inode->taille - (decalage + nbOctetsLus);
             }
 
-            if (octetsALireDansBloc <= 0) {
+            if (nbOctetsALire <= 0) {
                 continuer = 0; 
             } else {
-                LireContenuBloc(inode->blocDonnees[indexBloc], bufferTemp, TAILLE_BLOC);
+                LireContenuBloc(inode->blocDonnees[iBloc], buffer, TAILLE_BLOC);
 
-                for (int i = 0; i < octetsALireDansBloc; i++) {
-                    contenu[octetsLusTotal + i] = bufferTemp[offsetDansBloc + i];
+                for (int i = 0; i < nbOctetsALire; i++) {
+                    contenu[nbOctetsLus + i] = buffer[decalageBloc + i];
                 }
 
-                octetsLusTotal += octetsALireDansBloc;
-                indexBloc++;
-                offsetDansBloc = 0;
+                nbOctetsLus += nbOctetsALire;
+                iBloc++;
+                decalageBloc = 0;
             }
         }
     }
 
     inode->dateDerAcces = time(NULL);
-    return octetsLusTotal;
+    return nbOctetsLus;
 }
 
 /* V3
@@ -250,9 +250,9 @@ long LireDonneesInode(tInode inode, unsigned char *contenu, long taille, long de
  * Sortie : le nombre d'octets effectivement écrits, ou -1 en cas d'erreur
  */
 long EcrireDonneesInode(tInode inode, unsigned char *contenu, long taille, long decalage) {
-    long octetsEcritsTotal = 0;
-    long octetsAEcrireDansBloc;
-    unsigned char bufferTemp[TAILLE_BLOC];
+    long nbOctetsEcrits = 0;
+    long nbOctetsAEcrire;
+    unsigned char buffer[TAILLE_BLOC];
 
 
     if (inode == NULL){
@@ -263,42 +263,42 @@ long EcrireDonneesInode(tInode inode, unsigned char *contenu, long taille, long 
         decalage = inode->taille; 
     }
 
-    int indexBloc = decalage / TAILLE_BLOC, offsetDansBloc = decalage % TAILLE_BLOC;
+    int iBloc = decalage / TAILLE_BLOC, decalageBloc = decalage % TAILLE_BLOC;
 
-    while (octetsEcritsTotal < taille && indexBloc < NB_BLOCS_DIRECTS) {
-        if (inode->blocDonnees[indexBloc] == NULL) {
-            inode->blocDonnees[indexBloc] = CreerBloc();
-            if (inode->blocDonnees[indexBloc] == NULL){
+    while (nbOctetsEcrits < taille && iBloc < NB_BLOCS_DIRECTS) {
+        if (inode->blocDonnees[iBloc] == NULL) {
+            inode->blocDonnees[iBloc] = CreerBloc();
+            if (inode->blocDonnees[iBloc] == NULL){
                 return -1;
             }
         }
 
-        LireContenuBloc(inode->blocDonnees[indexBloc], bufferTemp, TAILLE_BLOC);
-        octetsAEcrireDansBloc = TAILLE_BLOC - offsetDansBloc;
+        LireContenuBloc(inode->blocDonnees[iBloc], buffer, TAILLE_BLOC);
+        nbOctetsAEcrire = TAILLE_BLOC - decalageBloc;
 
-        if (octetsAEcrireDansBloc > (taille - octetsEcritsTotal)) {
-            octetsAEcrireDansBloc = taille - octetsEcritsTotal;
+        if (nbOctetsAEcrire > (taille - nbOctetsEcrits)) {
+            nbOctetsAEcrire = taille - nbOctetsEcrits;
         }
 
-        for (int i = 0; i < octetsAEcrireDansBloc; i++) {
-            bufferTemp[offsetDansBloc + i] = contenu[octetsEcritsTotal + i];
+        for (int i = 0; i < nbOctetsAEcrire; i++) {
+            buffer[decalageBloc + i] = contenu[nbOctetsEcrits + i];
         }
 
-        EcrireContenuBloc(inode->blocDonnees[indexBloc], bufferTemp, TAILLE_BLOC);
-        octetsEcritsTotal += octetsAEcrireDansBloc;
-        indexBloc++;
-        offsetDansBloc = 0;
+        EcrireContenuBloc(inode->blocDonnees[iBloc], buffer, TAILLE_BLOC);
+        nbOctetsEcrits += nbOctetsAEcrire;
+        iBloc++;
+        decalageBloc = 0;
     }
 
-    if ((decalage + octetsEcritsTotal) > inode->taille) {
-        inode->taille = decalage + octetsEcritsTotal;
+    if ((decalage + nbOctetsEcrits) > inode->taille) {
+        inode->taille = decalage + nbOctetsEcrits;
     }
 
     time_t t = time(NULL);
     inode->dateDerModif = t;
     inode->dateDerModifInode = t;
 
-    return octetsEcritsTotal;
+    return nbOctetsEcrits;
 }
 
 /* V3

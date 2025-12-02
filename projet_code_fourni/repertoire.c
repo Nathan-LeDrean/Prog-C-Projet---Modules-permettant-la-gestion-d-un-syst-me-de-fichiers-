@@ -29,16 +29,16 @@ tRepertoire CreerRepertoire(void) {
         return NULL;
     }
 
-    long nbMaxEntrees = TailleMaxFichier() / sizeof(struct sEntreesRepertoire);
+    long nbMax = TailleMaxFichier() / sizeof(struct sEntreesRepertoire);
     
-    rep->table = (tEntreesRepertoire *)malloc(nbMaxEntrees * sizeof(tEntreesRepertoire));
+    rep->table = (tEntreesRepertoire *)malloc(nbMax * sizeof(tEntreesRepertoire));
     if (rep->table == NULL) {
         fprintf(stderr, "CreerRepertoire: probleme creation table\n");
         free(rep);
         return NULL;
     }
 
-    for (int i = 0; i < nbMaxEntrees; i++) {
+    for (int i = 0; i < nbMax; i++) {
         rep->table[i] = NULL;
     }
     return rep;
@@ -50,8 +50,8 @@ tRepertoire CreerRepertoire(void) {
  */
 void DetruireRepertoire(tRepertoire *pRep) {
     if (pRep != NULL && *pRep != NULL) {
-        long nbMaxEntrees = TailleMaxFichier() / sizeof(struct sEntreesRepertoire);
-        for (int i = 0; i < nbMaxEntrees; i++) {
+        long nbMax = TailleMaxFichier() / sizeof(struct sEntreesRepertoire);
+        for (int i = 0; i < nbMax; i++) {
             if ((*pRep)->table[i] != NULL) {
                 free((*pRep)->table[i]);
             }
@@ -75,30 +75,30 @@ int EcrireEntreeRepertoire(tRepertoire rep, char nomEntree[], unsigned int numer
         return -1;
     }
 
-    long nbMaxEntrees = TailleMaxFichier() / sizeof(struct sEntreesRepertoire);
-    int indexLibre = -1, trouve = 0;
+    long nbMax = TailleMaxFichier() / sizeof(struct sEntreesRepertoire);
+    int iLibre = -1, trouve = 0;
 
-    for (int i = 0; i < nbMaxEntrees && !trouve; i++) {
+    for (int i = 0; i < nbMax && !trouve; i++) {
         if (rep->table[i] != NULL) {
             if (strcmp(rep->table[i]->nomEntree, nomEntree) == 0) {
                 rep->table[i]->numeroInode = numeroInode;
                 trouve = 1;
             }
-        } else if (indexLibre == -1) {
-            indexLibre = i;
+        } else if (iLibre == -1) {
+            iLibre = i;
         }
     }
 
     if (!trouve) {
-        if (indexLibre != -1) {
-            rep->table[indexLibre] = (tEntreesRepertoire)malloc(sizeof(struct sEntreesRepertoire));
-            if (rep->table[indexLibre] == NULL) {
+        if (iLibre != -1) {
+            rep->table[iLibre] = (tEntreesRepertoire)malloc(sizeof(struct sEntreesRepertoire));
+            if (rep->table[iLibre] == NULL) {
                 return -1;
             }
-            memset(rep->table[indexLibre], 0, sizeof(struct sEntreesRepertoire));
-            strncpy(rep->table[indexLibre]->nomEntree, nomEntree, TAILLE_NOM_FICHIER);
-            rep->table[indexLibre]->nomEntree[TAILLE_NOM_FICHIER] = '\0';
-            rep->table[indexLibre]->numeroInode = numeroInode;
+            memset(rep->table[iLibre], 0, sizeof(struct sEntreesRepertoire));
+            strncpy(rep->table[iLibre]->nomEntree, nomEntree, TAILLE_NOM_FICHIER);
+            rep->table[iLibre]->nomEntree[TAILLE_NOM_FICHIER] = '\0';
+            rep->table[iLibre]->numeroInode = numeroInode;
         } else {
             return -1;
         }
@@ -123,17 +123,17 @@ int LireRepertoireDepuisInode(tRepertoire *pRep, tInode inode) {
     }
 
     struct sEntreesRepertoire entreeTemp;
-    long offset = 0;
-    long tailleFichier = Taille(inode);
-    long nbEntrees = tailleFichier / sizeof(struct sEntreesRepertoire);
+    long decalage = 0;
+    long tailleF = Taille(inode);
+    long nbEntrees = tailleF / sizeof(struct sEntreesRepertoire);
 
     for (int i = 0; i < nbEntrees; i++) {
-        if (LireDonneesInode(inode, (unsigned char *)&entreeTemp, sizeof(struct sEntreesRepertoire), offset) != sizeof(struct sEntreesRepertoire)) {
+        if (LireDonneesInode(inode, (unsigned char *)&entreeTemp, sizeof(struct sEntreesRepertoire), decalage) != sizeof(struct sEntreesRepertoire)) {
             DetruireRepertoire(pRep);
             return -1;
         }
         EcrireEntreeRepertoire(*pRep, entreeTemp.nomEntree, entreeTemp.numeroInode);
-        offset += sizeof(struct sEntreesRepertoire);
+        decalage += sizeof(struct sEntreesRepertoire);
     }
     return 0;
 }
@@ -148,15 +148,15 @@ int EcrireRepertoireDansInode(tRepertoire rep, tInode inode) {
         return -1;
     }
 
-    long nbMaxEntrees = TailleMaxFichier() / sizeof(struct sEntreesRepertoire);
-    long offset = 0;
+    long nbMax = TailleMaxFichier() / sizeof(struct sEntreesRepertoire);
+    long decalage = 0;
 
-    for (int i = 0; i < nbMaxEntrees; i++) {
+    for (int i = 0; i < nbMax; i++) {
         if (rep->table[i] != NULL) {
-            if (EcrireDonneesInode(inode, (unsigned char *)rep->table[i], sizeof(struct sEntreesRepertoire), offset) != sizeof(struct sEntreesRepertoire)) {
+            if (EcrireDonneesInode(inode, (unsigned char *)rep->table[i], sizeof(struct sEntreesRepertoire), decalage) != sizeof(struct sEntreesRepertoire)) {
                 return -1;
             }
-            offset += sizeof(struct sEntreesRepertoire);
+            decalage += sizeof(struct sEntreesRepertoire);
         }
     }
     return 0;
@@ -171,17 +171,17 @@ int EntreesContenuesDansRepertoire(tRepertoire rep,  struct sEntreesRepertoire t
         return 0;
     }
 
-    int count = 0;
-    long nbMaxEntrees = TailleMaxFichier() / sizeof(struct sEntreesRepertoire);
+    int c = 0;
+    long nbMax = TailleMaxFichier() / sizeof(struct sEntreesRepertoire);
 
-    for (int i = 0; i < nbMaxEntrees; i++) {
+    for (int i = 0; i < nbMax; i++) {
         if (rep->table[i] != NULL) {
-            strcpy(tabNumInodes[count].nomEntree, rep->table[i]->nomEntree);
-            tabNumInodes[count].numeroInode = rep->table[i]->numeroInode;
-            count++;
+            strcpy(tabNumInodes[c].nomEntree, rep->table[i]->nomEntree);
+            tabNumInodes[c].numeroInode = rep->table[i]->numeroInode;
+            c++;
         }
     }
-    return count;
+    return c;
 }
 /* V4
  * Compte le nombre d'entrées d'un répertoire.
@@ -193,15 +193,15 @@ int NbEntreesRepertoire(tRepertoire rep) {
         return 0;
     }
 
-    int count = 0;
-    long nbMaxEntrees = TailleMaxFichier() / sizeof(struct sEntreesRepertoire);
+    int c = 0;
+    long nbMax = TailleMaxFichier() / sizeof(struct sEntreesRepertoire);
 
-    for (int i = 0; i < nbMaxEntrees; i++) {
+    for (int i = 0; i < nbMax; i++) {
         if (rep->table[i] != NULL) {
-            count++;
+            c++;
         }
     }
-    return count;
+    return c;
 }
 
 /* V4
@@ -214,9 +214,9 @@ void AfficherRepertoire(tRepertoire rep) {
         return;
     }
 
-    long nbMaxEntrees = TailleMaxFichier() / sizeof(struct sEntreesRepertoire);
+    long nbMax = TailleMaxFichier() / sizeof(struct sEntreesRepertoire);
     
-    for (int i = 0; i < nbMaxEntrees; i++) {
+    for (int i = 0; i < nbMax; i++) {
         if (rep->table[i] != NULL) {
             printf("%s : %u\n", rep->table[i]->nomEntree, rep->table[i]->numeroInode);
         }

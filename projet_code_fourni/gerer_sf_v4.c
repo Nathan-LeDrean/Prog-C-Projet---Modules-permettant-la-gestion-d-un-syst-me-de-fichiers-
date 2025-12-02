@@ -15,14 +15,12 @@ int main(void) {
     char fichier1[] = "chat.txt";
     char fichier2[] = "lion.txt";
     char save[] = "systeme.dat";
-    FILE *f;
-    tSF sf;
 
     printf("--- TEST VERSION 4 ---\n");
 
     // 1. Création de fichiers réels pour le test
     printf("[1] Creation fichiers reels sur le disque...\n");
-    f = fopen(fichier1, "w"); 
+    FILE *f = fopen(fichier1, "w"); 
     if(f) { 
         fprintf(f, "Miaou"); 
         fclose(f); 
@@ -36,7 +34,7 @@ int main(void) {
 
     // 2. Création du SF (avec initialisation de la racine)
     printf("[2] Creation SF (avec racine)...\n");
-    sf = CreerSF("DisqueV4");
+    tSF sf = CreerSF("DisqueV4");
     
     if (sf == NULL) {
         remove(fichier1);

@@ -265,10 +265,10 @@ long EcrireFichierSF(tSF sf, char nomFichier[], natureFichier type) {
         free(buffer); return -1;
     }
 
-    long ecrits = EcrireDonneesInode(inode, buffer, tailleFichier, 0);
+    long nbecrits = EcrireDonneesInode(inode, buffer, tailleFichier, 0);
     free(buffer);
 
-    if (ecrits == -1) {
+    if (nbecrits == -1) {
         DetruireInode(&inode); return -1;
     }
 
@@ -289,7 +289,7 @@ long EcrireFichierSF(tSF sf, char nomFichier[], natureFichier type) {
     EcrireRepertoireDansInode(repRacine, racineInode);
     DetruireRepertoire(&repRacine);
 
-    return ecrits;
+    return nbecrits;
 }
 /* V3
  * Sauvegarde un système de fichiers dans un fichier (sur disque).
@@ -393,7 +393,6 @@ int Ls(tSF sf, bool detail) {
             while(courant != NULL) {
                 if (Numero(courant->inode) == tab[i].numeroInode) {
                     inodeCible = courant->inode;
-                    break;
                 }
                 courant = courant->suivant;
             }

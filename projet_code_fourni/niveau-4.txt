@@ -1,9 +1,8 @@
 Niveau réalisé : 4
 
 Le programme fonctionne pour tous les niveaux.
-La compilation est sans erreur et Valgrind ne signale aucune fuite ni erreur.
 
 Utilisation de l'IA :
 J'ai utilisé une IA pour :
-1. Vérifier que mon code respectait bien toutes les contraintes du sujet (noms des fonctions, affichages exacts).
+1. Après avoir codé les 4 versions, vérifier que mon code respectait bien toutes les consignes du sujet.
 2. M'aider à comprendre et corriger les erreurs signalées par Valgrind. C'est l'IA qui m'a indiqué d'utiliser `memset` pour initialiser les structures à 0, ce qui était nécessaire pour supprimer les erreurs de type "Uninitialised value".

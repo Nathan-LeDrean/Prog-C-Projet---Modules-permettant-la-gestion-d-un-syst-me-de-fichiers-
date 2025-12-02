@@ -19,9 +19,10 @@ tBloc CreerBloc(void) {
     tBloc bloc = (tBloc)malloc(TAILLE_BLOC * sizeof(unsigned char));
 
     if (bloc == NULL) {
-        fprintf(stderr, "CreerBloc: probleme creation\n");
+        fprintf(stderr, "CreerBloc: probleme de creation\n");
         return NULL;
     }
+
     memset(bloc, 0, TAILLE_BLOC);
     return bloc;
 }
@@ -49,16 +50,16 @@ long EcrireContenuBloc(tBloc bloc, unsigned char *contenu, long taille) {
         return -1;
     }
     
-    long aCopier;
+    long copie;
 
     if (taille > TAILLE_BLOC) {
-        aCopier = TAILLE_BLOC;
+        copie = TAILLE_BLOC;
     } else {
-        aCopier = taille;
+        copie = taille;
     }
 
-    memcpy(bloc, contenu, aCopier);
-    return aCopier;
+    memcpy(bloc, contenu, copie);
+    return copie;
 }
 
 /* V1
@@ -72,15 +73,16 @@ long LireContenuBloc(tBloc bloc, unsigned char *contenu, long taille) {
         return -1;
     }
 
-    long aCopier;
+    long copie;
+
     if (taille > TAILLE_BLOC) {
-        aCopier = TAILLE_BLOC;
+        copie = TAILLE_BLOC;
     } else {
-        aCopier = taille;
+        copie = taille;
     }
 
-    memcpy(contenu, bloc, aCopier);
-    return aCopier;
+    memcpy(contenu, bloc, copie);
+    return copie;
 }
 
 /* V3

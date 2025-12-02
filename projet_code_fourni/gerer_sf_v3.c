@@ -13,7 +13,7 @@
 
 int main(void) {
     char fichierSource[] = "gros_fichier.txt";
-    char fichierSauvegarde[] = "systeme.dat";
+    char fichierSave[] = "systeme.dat";
 
     printf("--- TEST VERSION 3 ---\n");
 
@@ -43,8 +43,8 @@ int main(void) {
     AfficherSF(sf);
 
     // 5. Sauvegarde SF
-    printf("[5] Sauvegarde SF vers '%s'...\n", fichierSauvegarde);
-    if (SauvegarderSF(sf, fichierSauvegarde) == 0) {
+    printf("[5] Sauvegarde SF vers '%s'...\n", fichierSave);
+    if (SauvegarderSF(sf, fichierSave) == 0) {
         printf("Sauvegarde reussie.\n");
     }
 
@@ -53,8 +53,8 @@ int main(void) {
     DetruireSF(&sf);
 
     // 7. Chargement SF
-    printf("[7] Chargement SF depuis '%s'...\n", fichierSauvegarde);
-    if (ChargerSF(&sf, fichierSauvegarde) == 0) {
+    printf("[7] Chargement SF depuis '%s'...\n", fichierSave);
+    if (ChargerSF(&sf, fichierSave) == 0) {
         printf("Chargement reussi.\n");
         printf("[8] Affichage SF restaure :\n");
         AfficherSF(sf);
@@ -64,7 +64,7 @@ int main(void) {
     }
 
     remove(fichierSource);
-    remove(fichierSauvegarde);
+    remove(fichierSave);
     
     printf("\n--- FIN TEST VERSION 3 ---\n");
     return 0;

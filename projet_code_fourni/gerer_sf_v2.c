@@ -12,40 +12,37 @@
 #include "inode.h"  
 
 int main(void) {
-    tSF monSF;
-    FILE *f;
-    char nomFichierTest[] = "test_v2.txt";
-    char contenuTest[] = "Ceci est un petit fichier texte pour tester la V2 du projet.";
-    long octetsEcrits;
+    char nomFichier[] = "test_v2.txt";
+    char contenu[] = "Ceci est un petit fichier texte pour tester la V2 du projet.";
 
     printf("--- DEBUT TEST VERSION 2 ---\n");
 
     // Etape 0 : Création d'un vrai fichier sur le disque pour le test
-    printf("[0] Creation du fichier reel '%s' sur le disque...\n", nomFichierTest);
-    f = fopen(nomFichierTest, "w"); 
+    printf("[0] Creation du fichier reel '%s' sur le disque...\n", nomFichier);
+    FILE *f = fopen(nomFichier, "w"); 
     if (f == NULL) {
         fprintf(stderr, "Erreur creation fichier test\n");
         return 1;
     }
 
-    fprintf(f, "%s", contenuTest);
+    fprintf(f, "%s", contenu);
     fclose(f);
 
     // Etape 1 : Création du Système de Fichiers
     printf("\n[1] Creation du Systeme de Fichiers 'DisqueDur'...\n");
-    monSF = CreerSF("DisqueDur");
+    tSF SF = CreerSF("DisqueDur");
 
-    if (monSF == NULL) {
+    if (SF == NULL) {
         fprintf(stderr, "Erreur fatale : Echec creation SF.\n");
         return 1;
     }
 
-    AfficherSF(monSF);
+    AfficherSF(SF);
 
     // Etape 2 : Ajout d'un fichier dans le SF
-    printf("\n[2] Ajout du fichier '%s' dans le SF...\n", nomFichierTest);
+    printf("\n[2] Ajout du fichier '%s' dans le SF...\n", nomFichier);
     
-    octetsEcrits = Ecrire1BlocFichierSF(monSF, nomFichierTest, ORDINAIRE);
+    long octetsEcrits = Ecrire1BlocFichierSF(SF, nomFichier, ORDINAIRE);
 
     if (octetsEcrits == -1) {
         fprintf(stderr, "Erreur lors de l'ajout du fichier dans le SF.\n");
@@ -57,17 +54,17 @@ int main(void) {
      * On doit voir le Super-Bloc à jour et un Inode dans la liste
      */
     printf("\n[3] Etat du SF apres ajout :\n");
-    AfficherSF(monSF);
+    AfficherSF(SF);
 
     // Etape 4 : Destruction
     printf("\n[4] Destruction du SF...\n");
-    DetruireSF(&monSF);
+    DetruireSF(&SF);
 
-    if (monSF == NULL) {
+    if (SF == NULL) {
         printf("SF detruit correctement.\n");
     }
 
-    remove(nomFichierTest); 
+    remove(nomFichier); 
 
     printf("\n--- FIN TEST VERSION 2 ---\n");
     return 0;
