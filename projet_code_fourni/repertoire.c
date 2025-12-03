@@ -38,7 +38,7 @@ tRepertoire CreerRepertoire(void) {
         return NULL;
     }
 
-    for (int i = 0; i < MAX; i++) {
+    for (unsigned long i = 0; i < MAX; i++) {
         rep->table[i] = NULL;
     }
     return rep;
@@ -50,7 +50,7 @@ tRepertoire CreerRepertoire(void) {
  */
 void DetruireRepertoire(tRepertoire *pRep) {
     if (pRep != NULL && *pRep != NULL) {
-        for (int i = 0; i < MAX; i++) {
+        for (unsigned long i = 0; i < MAX; i++) {
             if ((*pRep)->table[i] != NULL) {
                 free((*pRep)->table[i]);
             }
@@ -76,7 +76,7 @@ int EcrireEntreeRepertoire(tRepertoire rep, char nomEntree[], unsigned int numer
 
     int k = -1, existe = 0;
 
-    for (int i = 0; i < MAX && !existe; i++) {
+    for (unsigned long i = 0; i < MAX && !existe; i++) {
         if (rep->table[i] != NULL) {
             if (strcmp(rep->table[i]->nomEntree, nomEntree) == 0) {
                 rep->table[i]->numeroInode = numeroInode;
@@ -148,7 +148,7 @@ int EcrireRepertoireDansInode(tRepertoire rep, tInode inode) {
 
     long decalage = 0;
 
-    for (int i = 0; i < MAX; i++) {
+    for (unsigned long i = 0; i < MAX; i++) {
         if (rep->table[i] != NULL) {
             if (EcrireDonneesInode(inode, (unsigned char *)rep->table[i], sizeof(struct sEntreesRepertoire), decalage) != sizeof(struct sEntreesRepertoire)) {
                 return -1;
@@ -170,7 +170,7 @@ int EntreesContenuesDansRepertoire(tRepertoire rep,  struct sEntreesRepertoire t
 
     int c = 0;
 
-    for (int i = 0; i < MAX; i++) {
+    for (unsigned long i = 0; i < MAX; i++) {
         if (rep->table[i] != NULL) {
             strcpy(tabNumInodes[c].nomEntree, rep->table[i]->nomEntree);
             tabNumInodes[c].numeroInode = rep->table[i]->numeroInode;
@@ -191,7 +191,7 @@ int NbEntreesRepertoire(tRepertoire rep) {
 
     int c = 0;
 
-    for (int i = 0; i < MAX; i++) {
+    for (unsigned long i = 0; i < MAX; i++) {
         if (rep->table[i] != NULL) {
             c++;
         }
@@ -209,7 +209,7 @@ void AfficherRepertoire(tRepertoire rep) {
         return;
     }
     
-    for (int i = 0; i < MAX; i++) {
+    for (unsigned long i = 0; i < MAX; i++) {
         if (rep->table[i] != NULL) {
             printf("%s : %u\n", rep->table[i]->nomEntree, rep->table[i]->numeroInode);
         }
