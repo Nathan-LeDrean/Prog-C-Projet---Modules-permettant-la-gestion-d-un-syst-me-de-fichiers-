@@ -13,7 +13,7 @@
 
 int main(void) {
     char nomFichier[] = "test_v2.txt";
-    char contenu[] = "Ceci est un petit fichier texte pour tester la V2 du projet.";
+    char contenu[] = "Ceci est un fichier pour tester la V2 du projet.";
 
     printf("--- DEBUT TEST VERSION 2 ---\n");
 

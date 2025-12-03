@@ -13,7 +13,7 @@
 
 int main(void) {
     char fichier1[] = "chat.txt";
-    char fichier2[] = "lion.txt";
+    char fichier2[] = "grenouille.txt";
     char save[] = "systeme.dat";
 
     printf("--- TEST VERSION 4 ---\n");
@@ -38,7 +38,7 @@ int main(void) {
     
     f = fopen(fichier2, "w"); 
     if(f) { 
-        fprintf(f, "Roar"); 
+        fprintf(f, "croicroi"); 
         fclose(f); 
     }
 

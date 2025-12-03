@@ -30,10 +30,10 @@ int main(void) {
 
     // 2. Création SF
     printf("[2] Creation SF...\n");
-    tSF sf = CreerSF("DisqueV3");
+    tSF sf = CreerSF("Disque");
     
-    // 3. Ajout fichier (multi-blocs)
-    printf("[3] Ajout fichier (multi-blocs)...\n");
+    // 3. Ajout fichier
+    printf("[3] Ajout fichier\n");
     if (EcrireFichierSF(sf, fichierSource, ORDINAIRE) > 0) {
         printf("Fichier ajoute.\n");
     }

@@ -64,10 +64,12 @@ struct sSF
 */
 static tSuperBloc CreerSuperBloc(char nomDisque[]) {
     tSuperBloc sb = (tSuperBloc)malloc(sizeof(struct sSuperBloc));
+
     if (sb == NULL) {
         fprintf(stderr, "Creer Super Bloc probleme creation\n");
         return NULL;
     }
+
     memset(sb, 0, sizeof(struct sSuperBloc));
     strncpy(sb->nomDisque, nomDisque, TAILLE_NOM_DISQUE);
     sb->nomDisque[TAILLE_NOM_DISQUE] = '\0';
@@ -246,11 +248,11 @@ long EcrireFichierSF(tSF sf, char nomFichier[], natureFichier type) {
     }
 
     fseek(f, 0, SEEK_END);
-    long tailleFichier = ftell(f);
+    long tailleTotale = ftell(f);
     fseek(f, 0, SEEK_SET);
-    unsigned char *buffer = malloc(tailleFichier);
+    unsigned char *buffer = malloc(tailleTotale);
 
-    if (fread(buffer, 1, tailleFichier, f) != (size_t)tailleFichier) {
+    if (fread(buffer, 1, tailleTotale, f) != (size_t)tailleTotale) {
         free(buffer); 
         fclose(f); 
         return -1;
@@ -264,7 +266,7 @@ long EcrireFichierSF(tSF sf, char nomFichier[], natureFichier type) {
         free(buffer); return -1;
     }
 
-    long nbecrits = EcrireDonneesInode(inode, buffer, tailleFichier, 0);
+    long nbecrits = EcrireDonneesInode(inode, buffer, tailleTotale, 0);
     free(buffer);
 
     if (nbecrits == -1) {
@@ -299,7 +301,9 @@ int SauvegarderSF(tSF sf, char nomFichier[]) {
     if (sf == NULL) {
         return -1;
     }
+
     FILE *f = fopen(nomFichier, "wb");
+
     if (f == NULL) {
         return -1;
     }
@@ -307,6 +311,7 @@ int SauvegarderSF(tSF sf, char nomFichier[]) {
     fwrite(sf->superBloc, sizeof(struct sSuperBloc), 1, f);
     fwrite(&(sf->listeInodes.nbInodes), sizeof(int), 1, f);
     struct sListeInodesElement *courant = sf->listeInodes.premier;
+
     while (courant != NULL) {
         if (SauvegarderInode(courant->inode, f) != 0) {
             fclose(f); return -1;
@@ -325,6 +330,7 @@ int SauvegarderSF(tSF sf, char nomFichier[]) {
  */
 int ChargerSF(tSF *pSF, char nomFichier[]) {
     FILE *f = fopen(nomFichier, "rb");
+
     if (f == NULL) {
         return -1;
     }
@@ -379,13 +385,12 @@ int Ls(tSF sf, bool detail) {
         return 1;
     }
 
-    int nbFichiers = NbEntreesRepertoire(rep);
-    printf("Nombre de fichiers dans le répertoire racine : %d\n", nbFichiers);
-    long maxEntrees = TailleMaxFichier() / sizeof(struct sEntreesRepertoire);
-    struct sEntreesRepertoire *tab = malloc(maxEntrees * sizeof(struct sEntreesRepertoire));
+    printf("Nombre de fichiers dans le répertoire racine : %d\n", NbEntreesRepertoire(rep));
+    long max = TailleMaxFichier() / sizeof(struct sEntreesRepertoire);
+    struct sEntreesRepertoire *tab = malloc(max * sizeof(struct sEntreesRepertoire));
     EntreesContenuesDansRepertoire(rep, tab);
 
-    for (int i = 0; i < nbFichiers; i++) {
+    for (int i = 0; i < NbEntreesRepertoire(rep); i++) {
         if (detail) {
             tInode inodeCible = NULL;
             struct sListeInodesElement *courant = sf->listeInodes.premier;
@@ -397,11 +402,11 @@ int Ls(tSF sf, bool detail) {
             }
 
             if (inodeCible) {
-                char *typeStr = "INCONNU";
+                char *type = "INCONNU";
                 if (Type(inodeCible) == ORDINAIRE) {
-                    typeStr = "ORDINAIRE";
+                    type = "ORDINAIRE";
                 } else if (Type(inodeCible) == REPERTOIRE) {
-                    typeStr = "REPERTOIRE";
+                    type = "REPERTOIRE";
                 }
                 
                 char *date = ctime((const time_t []){DateDerModif(inodeCible)});
@@ -409,7 +414,7 @@ int Ls(tSF sf, bool detail) {
 
                 printf("%-3u %-12s %6ld %s %s\n", 
                     Numero(inodeCible), 
-                    typeStr, 
+                    type, 
                     Taille(inodeCible), 
                     date, 
                     tab[i].nomEntree);

@@ -50,12 +50,10 @@ long EcrireContenuBloc(tBloc bloc, unsigned char *contenu, long taille) {
         return -1;
     }
     
-    long copie;
+    long copie = taille;
 
     if (taille > TAILLE_BLOC) {
         copie = TAILLE_BLOC;
-    } else {
-        copie = taille;
     }
 
     memcpy(bloc, contenu, copie);
@@ -73,12 +71,11 @@ long LireContenuBloc(tBloc bloc, unsigned char *contenu, long taille) {
         return -1;
     }
 
-    long copie;
+    long copie = taille;
+
 
     if (taille > TAILLE_BLOC) {
         copie = TAILLE_BLOC;
-    } else {
-        copie = taille;
     }
 
     memcpy(contenu, bloc, copie);

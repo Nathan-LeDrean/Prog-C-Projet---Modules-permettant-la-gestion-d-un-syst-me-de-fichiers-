@@ -49,11 +49,6 @@ tInode CreerInode(int numInode, natureFichier type) {
     inode->numero = numInode;
     inode->type = type;
     inode->taille = 0;
-
-    for (int i = 0; i < NB_BLOCS_DIRECTS; i++) {
-        inode->blocDonnees[i] = NULL;
-    }
-
     time_t t = time(NULL);
     inode->dateDerAcces = t;
     inode->dateDerModif = t;
