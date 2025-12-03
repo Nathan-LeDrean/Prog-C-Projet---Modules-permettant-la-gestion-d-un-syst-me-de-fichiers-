@@ -11,7 +11,7 @@ $(EXE):  $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $(EXE)
 
 # Regenerer les .o quand les .h ou .c changent
-gerer_sfv1.o : gerer_sf_v1.c bloc.h inode.h
+gerer_sf_v1.o : gerer_sf_v1.c bloc.h inode.h
 	$(CC) $(CFLAGS) -c gerer_sf_v1.c
 
 bloc.o : bloc.c bloc.h

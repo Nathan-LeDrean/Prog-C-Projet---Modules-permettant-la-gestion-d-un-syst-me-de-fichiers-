@@ -79,11 +79,11 @@ int main(void) {
 
         // 11. Lister sans détail 
         printf("\n[11] Liste sans detail apres restauration :\n");
-        Ls(sf, false);
+        Ls(sf, 0);
 
         // 12. Lister avec détails 
         printf("\n[12] Liste avec details apres restauration :\n");
-        Ls(sf, true);
+        Ls(sf, 1);
         
         // 13. Le détruire 
         printf("\n[13] Destruction finale...\n");

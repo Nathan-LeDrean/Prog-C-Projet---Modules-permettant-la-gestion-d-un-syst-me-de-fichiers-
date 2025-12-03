@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#include <stdbool.h>
 #include "inode.h"      
 #include "repertoire.h" 
 #include "sf.h"         

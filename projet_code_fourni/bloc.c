@@ -19,7 +19,7 @@ tBloc CreerBloc(void) {
     tBloc bloc = (tBloc)malloc(TAILLE_BLOC * sizeof(unsigned char));
 
     if (bloc == NULL) {
-        fprintf(stderr, "CreerBloc: probleme de creation\n");
+        fprintf(stderr, "CreerBloc: probleme creation\n");
         return NULL;
     }
 
