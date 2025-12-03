@@ -122,8 +122,7 @@ int LireRepertoireDepuisInode(tRepertoire *pRep, tInode inode) {
 
     struct sEntreesRepertoire entreeTemp;
     long decalage = 0;
-    long tailleF = Taille(inode);
-    long nbEntrees = tailleF / sizeof(struct sEntreesRepertoire);
+    long nbEntrees = Taille(inode) / sizeof(struct sEntreesRepertoire);
 
     for (int i = 0; i < nbEntrees; i++) {
         if (LireDonneesInode(inode, (unsigned char *)&entreeTemp, sizeof(struct sEntreesRepertoire), decalage) != sizeof(struct sEntreesRepertoire)) {
